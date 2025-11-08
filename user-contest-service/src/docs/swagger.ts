@@ -4,14 +4,14 @@ const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "Quantum-Judge — User Contest Service",
-    version: "1.0.0",
-    description: "User & Contest microservice API",
+    version: "1.1.0",
+    description: "User & Contest microservice API with Problems, Contests, and Registration endpoints",
   },
 
   servers: [
     {
       url: "http://localhost:4000",
-      description: "Local",
+      description: "Local Development Server",
     },
   ],
 
@@ -44,10 +44,11 @@ const swaggerDefinition = {
         type: "object",
         properties: {
           id: { type: "string" },
-          name: { type: "string" },
+          title: { type: "string" },
           description: { type: "string" },
           startTime: { type: "string", format: "date-time" },
           endTime: { type: "string", format: "date-time" },
+          createdBy: { $ref: "#/components/schemas/User" },
         },
       },
 
@@ -56,8 +57,10 @@ const swaggerDefinition = {
         properties: {
           id: { type: "string" },
           title: { type: "string" },
-          statement: { type: "string" },
+          description: { type: "string" },
           difficulty: { type: "string" },
+          visibility: { type: "string", enum: ["PUBLIC", "PRIVATE"] },
+          createdBy: { $ref: "#/components/schemas/User" },
         },
       },
 
@@ -73,7 +76,6 @@ const swaggerDefinition = {
     },
   },
 
-  /* Apply cookie authentication globally */
   security: [{ cookieAuth: [] }],
 
   paths: {
@@ -99,7 +101,7 @@ const swaggerDefinition = {
             },
           },
         },
-        responses: { 201: { description: "Created" } },
+        responses: { 201: { description: "Organizer created" } },
       },
     },
 
@@ -122,7 +124,7 @@ const swaggerDefinition = {
             },
           },
         },
-        responses: { 201: { description: "Created" } },
+        responses: { 201: { description: "Contestant created" } },
       },
     },
 
@@ -144,7 +146,7 @@ const swaggerDefinition = {
             },
           },
         },
-        responses: { 200: { description: "Login success" } },
+        responses: { 200: { description: "Login successful" } },
       },
     },
 
@@ -153,16 +155,16 @@ const swaggerDefinition = {
         tags: ["Auth"],
         summary: "Logout user",
         security: [{ cookieAuth: [] }],
-        responses: { 200: { description: "Logged out" } },
+        responses: { 200: { description: "User logged out" } },
       },
     },
 
     "/api/auth/me": {
       get: {
         tags: ["Auth"],
-        summary: "Get authenticated user",
+        summary: "Get current authenticated user",
         security: [{ cookieAuth: [] }],
-        responses: { 200: { description: "User info" } },
+        responses: { 200: { description: "Authenticated user data" } },
       },
     },
 
@@ -172,7 +174,7 @@ const swaggerDefinition = {
     "/api/contests": {
       post: {
         tags: ["Contests"],
-        summary: "Create contest",
+        summary: "Create a new contest",
         security: [{ cookieAuth: [] }],
         requestBody: {
           required: true,
@@ -180,16 +182,16 @@ const swaggerDefinition = {
             "application/json": { schema: { $ref: "#/components/schemas/Contest" } },
           },
         },
-        responses: { 201: { description: "Created" } },
+        responses: { 201: { description: "Contest created" } },
       },
       get: {
         tags: ["Contests"],
-        summary: "List contests",
+        summary: "List all contests",
         parameters: [
           { name: "skip", in: "query", schema: { type: "integer" } },
           { name: "take", in: "query", schema: { type: "integer" } },
         ],
-        responses: { 200: { description: "OK" } },
+        responses: { 200: { description: "Contest list" } },
       },
     },
 
@@ -198,14 +200,7 @@ const swaggerDefinition = {
         tags: ["Contests"],
         summary: "Get contest by ID",
         parameters: [{ name: "id", in: "path", required: true }],
-        responses: { 200: { description: "OK" }, 404: { description: "Not found" } },
-      },
-      delete: {
-        tags: ["Contests"],
-        summary: "Delete contest",
-        security: [{ cookieAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true }],
-        responses: { 204: { description: "Deleted" } },
+        responses: { 200: { description: "Contest data" }, 404: { description: "Not found" } },
       },
     },
 
@@ -228,17 +223,45 @@ const swaggerDefinition = {
             },
           },
         },
-        responses: { 201: { description: "Added" } },
+        responses: { 201: { description: "Problem added to contest" } },
       },
     },
 
     "/api/contests/problems/{cpId}": {
       delete: {
         tags: ["Contests"],
-        summary: "Remove contest problem",
+        summary: "Remove problem from contest",
         security: [{ cookieAuth: [] }],
         parameters: [{ name: "cpId", in: "path", required: true }],
-        responses: { 204: { description: "Removed" } },
+        responses: { 204: { description: "Problem removed" } },
+      },
+    },
+
+    "/api/contests/{id}/register": {
+      post: {
+        tags: ["Contests"],
+        summary: "Register for a contest",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true }],
+        responses: { 201: { description: "User registered for contest" } },
+      },
+    },
+
+    "/api/contests/created": {
+      get: {
+        tags: ["Contests"],
+        summary: "Get contests created by current organizer",
+        security: [{ cookieAuth: [] }],
+        responses: { 200: { description: "Organizer contests list" } },
+      },
+    },
+
+    "/api/contests/registered": {
+      get: {
+        tags: ["Contests"],
+        summary: "Get contests current contestant registered for",
+        security: [{ cookieAuth: [] }],
+        responses: { 200: { description: "Registered contests list" } },
       },
     },
 
@@ -248,40 +271,106 @@ const swaggerDefinition = {
     "/api/problems": {
       post: {
         tags: ["Problems"],
-        summary: "Create problem",
+        summary: "Create a problem (public/private)",
         security: [{ cookieAuth: [] }],
         requestBody: {
           required: true,
           content: {
-            "application/json": { schema: { $ref: "#/components/schemas/Problem" } },
+            "application/json": {
+              schema: {
+                required: ["title", "description", "visibility"],
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  difficulty: { type: "string" },
+                  visibility: { type: "string", enum: ["PUBLIC", "PRIVATE"] },
+                },
+              },
+            },
           },
         },
-        responses: { 201: { description: "Created" } },
+        responses: { 201: { description: "Problem created" } },
       },
       get: {
         tags: ["Problems"],
-        summary: "List problems",
+        summary: "List all public problems",
         parameters: [
           { name: "skip", in: "query", schema: { type: "integer" } },
           { name: "take", in: "query", schema: { type: "integer" } },
         ],
-        responses: { 200: { description: "OK" } },
+        responses: { 200: { description: "Public problems list" } },
       },
     },
 
     "/api/problems/{id}": {
       get: {
         tags: ["Problems"],
-        summary: "Get problem",
+        summary: "Get a problem by ID",
         parameters: [{ name: "id", in: "path", required: true }],
-        responses: { 200: { description: "OK" }, 404: { description: "Not found" } },
+        responses: { 200: { description: "Problem data" }, 404: { description: "Not found" } },
+      }, put: {
+    tags: ["Problems"],
+    summary: "Update a problem (Organizer only)",
+    security: [{ bearerAuth: [] }],
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: { type: "string" },
+        description: "Problem ID",
+      },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              title: { type: "string" },
+              description: { type: "string" },
+              accessType: { type: "string", enum: ["PUBLIC", "PRIVATE"] },
+            },
+          },
+        },
       },
     },
+    responses: {
+      200: { description: "Problem updated successfully" },
+      401: { description: "Unauthorized" },
+      403: { description: "Forbidden (not your problem)" },
+      404: { description: "Problem not found" },
+    },
+  },
+
+  delete: {
+    tags: ["Problems"],
+    summary: "Delete a problem (Organizer only)",
+    security: [{ bearerAuth: [] }],
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: { type: "string" },
+        description: "Problem ID",
+      },
+    ],
+    responses: {
+      200: { description: "Problem deleted successfully" },
+      401: { description: "Unauthorized" },
+      403: { description: "Forbidden (not your problem)" },
+      404: { description: "Problem not found" },
+    },
+  },
+    },
+    
 
     "/api/problems/{id}/testcases": {
       post: {
         tags: ["Problems"],
-        summary: "Add testcase",
+        summary: "Add a testcase to a problem",
         security: [{ cookieAuth: [] }],
         parameters: [{ name: "id", in: "path", required: true }],
         requestBody: {
@@ -299,7 +388,7 @@ const swaggerDefinition = {
             },
           },
         },
-        responses: { 201: { description: "Created" } },
+        responses: { 201: { description: "Testcase added" } },
       },
     },
 
@@ -309,7 +398,7 @@ const swaggerDefinition = {
     "/health": {
       get: {
         tags: ["Health"],
-        summary: "Health check",
+        summary: "Service health check",
         responses: { 200: { description: "OK" } },
       },
     },

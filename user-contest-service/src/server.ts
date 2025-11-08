@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { AppDataSource } from "./config/db";
 import app from "./app";
 import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "../src/docs/swagger";
+import swaggerSpec from "./docs/swagger";
 
 const PORT = process.env.PORT || 4000;
 

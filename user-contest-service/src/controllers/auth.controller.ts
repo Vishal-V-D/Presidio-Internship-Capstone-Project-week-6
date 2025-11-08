@@ -2,11 +2,18 @@ import { Request, Response } from "express";
 import * as authService from "../services/auth.service";
 import { UserRole } from "../entities/user.entity";
 
-// 🧾 Register Organizer
+// ✅ REGISTER ORGANIZER
 export const registerOrganizer = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
-  const user = await authService.registerUser(email, username, password, UserRole.ORGANIZER);
+  const user = await authService.registerUser(
+    email,
+    username,
+    password,
+    UserRole.ORGANIZER
+  );
+
   res.status(201).json({
+    message: "Organizer registered",
     user: {
       id: user.id,
       email: user.email,
@@ -16,11 +23,18 @@ export const registerOrganizer = async (req: Request, res: Response) => {
   });
 };
 
-// 🧾 Register Contestant
+// ✅ REGISTER CONTESTANT
 export const registerContestant = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
-  const user = await authService.registerUser(email, username, password, UserRole.CONTESTANT);
+  const user = await authService.registerUser(
+    email,
+    username,
+    password,
+    UserRole.CONTESTANT
+  );
+
   res.status(201).json({
+    message: "Contestant registered",
     user: {
       id: user.id,
       email: user.email,
@@ -29,22 +43,23 @@ export const registerContestant = async (req: Request, res: Response) => {
     },
   });
 };
-export const login = async (req: Request, res: Response) => {
-  const { identifier, password } = req.body;
-  const { token, user } = await authService.loginUser(identifier, password);
 
-  // 🍪 Set HttpOnly cookie (for browser-based frontend)
+// ✅ LOGIN
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const { token, user } = await authService.loginUser(email, password);
+
+  const isProd = process.env.NODE_ENV === "production";
+
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // only https in prod
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
   });
 
-  // 📦 Return token (for Swagger / Postman)
   res.status(200).json({
     message: "Login successful",
-    token: `Bearer ${token}`, // 👈 Added here for Swagger testing
     user: {
       id: user.id,
       email: user.email,
@@ -55,19 +70,26 @@ export const login = async (req: Request, res: Response) => {
 };
 
 
+// ✅ LOGOUT
 export const logout = async (req: Request, res: Response) => {
-  // 🍪 Clear cookie on logout
+  const isProd = process.env.NODE_ENV === "production";
+
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
   });
+
   res.status(200).json({ message: "Logged out successfully" });
 };
 
-// 🧍‍♂️ Current user (protected route)
+// ✅ GET CURRENT USER
 export const me = async (req: Request, res: Response) => {
   const user = (req as any).user;
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   res.json({ user });
 };
-
