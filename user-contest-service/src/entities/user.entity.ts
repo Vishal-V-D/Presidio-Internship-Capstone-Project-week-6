@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToMany,
+} from "typeorm";
+import { Contest } from "./contest.entity";
 
 export enum UserRole {
   ORGANIZER = "ORGANIZER",
@@ -25,6 +34,14 @@ export class User {
     default: UserRole.CONTESTANT,
   })
   role: UserRole;
+
+  // 🧑‍💼 Contests created by this user (Organizer)
+  @OneToMany(() => Contest, (contest) => contest.createdBy)
+  createdContests: Contest[];
+
+  // 🧍 Contests the user registered for (Contestant)
+  @ManyToMany(() => Contest, (contest) => contest.contestant)
+  registeredContests: Contest[];
 
   @CreateDateColumn()
   createdAt: Date;

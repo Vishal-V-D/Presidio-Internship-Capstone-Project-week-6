@@ -1,6 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
+import { User } from "./user.entity";
 import { TestCase } from "./testcase.entity";
 import { ContestProblem } from "./contestProblem.entity";
+
+export enum ProblemAccess {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
+}
 
 @Entity("problems")
 export class Problem {
@@ -27,6 +40,18 @@ export class Problem {
 
   @Column({ nullable: true })
   additionalInfo: string;
+
+  // 👇 Organizer who created this problem
+  @ManyToOne(() => User, { onDelete: "SET NULL", eager: true })
+  createdBy: User;
+
+  // 👇 Whether the problem is visible to all or restricted
+  @Column({
+    type: "enum",
+    enum: ProblemAccess,
+    default: ProblemAccess.PRIVATE,
+  })
+  accessType: ProblemAccess;
 
   @CreateDateColumn()
   createdAt: Date;

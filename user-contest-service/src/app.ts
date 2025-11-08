@@ -15,11 +15,20 @@ dotenv.config();
 const app = express();
 
 // 🔐 Security, CORS, and parsers
-app.use(helmet());
-app.use(cors({
-  origin: "http://localhost:4000", // or your swagger UI host
-  credentials: true,
-}));
+const allowedOrigins = ["http://localhost:5173","http://localhost:4000"];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));

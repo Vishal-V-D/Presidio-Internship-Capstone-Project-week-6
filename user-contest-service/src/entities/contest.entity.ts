@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+  CreateDateColumn,
+} from "typeorm";
 import { User } from "./user.entity";
 import { ContestProblem } from "./contestProblem.entity";
 
@@ -19,11 +28,28 @@ export class Contest {
   @Column("timestamp")
   endTime: Date;
 
-  @ManyToOne(() => User, { onDelete: "SET NULL" })
+  @Column({ type: "int", nullable: true })
+  durationMinutes?: number;
+
+  // 🧑‍💼 Organizer who created this contest
+  @ManyToOne(() => User, (user) => user.createdContests, {
+    onDelete: "SET NULL",
+    eager: true,
+  })
   createdBy: User;
 
+  // 🧩 Problems linked to this contest
   @OneToMany(() => ContestProblem, (cp) => cp.contest)
   contestProblems: ContestProblem[];
+
+  // 🧍 Contestants registered for this contest
+  @ManyToMany(() => User, (user) => user.registeredContests, {
+    eager: true,
+  })
+  @JoinTable({
+    name: "contest_registrations", // join table name
+  })
+  contestant: User[];
 
   @CreateDateColumn()
   createdAt: Date;
