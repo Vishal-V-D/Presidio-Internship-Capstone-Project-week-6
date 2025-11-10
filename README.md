@@ -36,14 +36,13 @@ graph LR
     FE -- "REST" --> UCON[User-Contest Service\nPort 4000]
     SUB -- "Problem metadata" --> UCON
     SUB -- "POST /api/ai/feedback" --> RAG[RAG Pipeline\nPort 8000]
-    UCON -- "TypeORM" --> MYSQL[(MySQL\nUsers/Contests/Problems)]
-    SUB -- "TypeORM" --> MYSQL_SUB[(MySQL\nSubmissions)]
-    RAG -- "Chroma" --> VECTOR[(Persisted Vector Store)]
+    UCON -- "TypeORM" --> MYSQL[MySQL\nUsers/Contests/Problems]
+    SUB -- "TypeORM" --> MYSQL_SUB[MySQL\nSubmissions]
+    RAG -- "Chroma" --> VECTOR[Persisted Vector Store]
 
 
 ```
 
----
 ## Process Workflows
 
 ### Submission-to-Feedback Flow
