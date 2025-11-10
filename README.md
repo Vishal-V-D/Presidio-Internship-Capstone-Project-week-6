@@ -38,6 +38,7 @@ graph LR
     SUB -- "TypeORM" --> MYSQL_SUB[(MySQL\nSubmissions)]
     RAG -- "Chroma" --> VECTOR[(Persisted Vector Store)]
 
+
 ```
 
 ---
