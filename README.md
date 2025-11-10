@@ -28,6 +28,8 @@ All services are container-ready, expose health probes, and communicate over RES
 ---
 
 ## Architecture Overview
+
+
 ```mermaid
 graph LR
     FE[Frontend Client (React/Vite)] -- "REST & WebSocket" --> SUB[Submission Service\nPort 5000]
@@ -42,7 +44,6 @@ graph LR
 ```
 
 ---
-
 ## Process Workflows
 
 ### Submission-to-Feedback Flow
