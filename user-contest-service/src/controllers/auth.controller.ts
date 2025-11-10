@@ -49,17 +49,9 @@ export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const { token, user } = await authService.loginUser(email, password);
 
-  const isProd = process.env.NODE_ENV === "production";
-
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
   res.status(200).json({
     message: "Login successful",
+    token: token,
     user: {
       id: user.id,
       email: user.email,
@@ -72,14 +64,7 @@ export const login = async (req: Request, res: Response) => {
 
 // ✅ LOGOUT
 export const logout = async (req: Request, res: Response) => {
-  const isProd = process.env.NODE_ENV === "production";
-
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-  });
-
+  // Token invalidation is handled client-side by removing the token
   res.status(200).json({ message: "Logged out successfully" });
 };
 

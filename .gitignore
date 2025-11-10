@@ -51,3 +51,30 @@ docker-data/
 
 # Debug dump
 *.pid
+
+# Python environment and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.python-version
+*.env/
+*.venv/
+venv/
+env/
+ENV/
+Pipfile
+Pipfile.lock
+.poetry/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+# Python virtual environments
+rag_env/
+**/rag_env/
+venv/
+**/venv/
+env/
+**/env/

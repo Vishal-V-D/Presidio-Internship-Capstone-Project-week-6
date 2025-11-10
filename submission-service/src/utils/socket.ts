@@ -3,6 +3,20 @@ import http from "http";
 
 let io: Server;
 
+// Hardcoded list of allowed origins
+const ALLOWED_ORIGINS = [
+  "http://localhost:8000",
+  "http://localhost:4000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com",
+  "http://localhost:5173",
+  "http://localhost:5000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com:5000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com:4000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com:8000",
+  "http://quantum-judge-frontend-dev.s3-website-us-east-1.amazonaws.com",
+  "https://dk1cx0l60ut7o.cloudfront.net"
+];
+
 /**
  * Initialize the Socket.IO server.
  * Called once from server.ts after creating the HTTP server.
@@ -10,9 +24,10 @@ let io: Server;
 export const initSocket = (server: http.Server): Server => {
   io = new Server(server, {
     cors: {
-      origin: ["http://localhost:3000", "http://localhost:4000"], // frontend + user/contest service
+      origin: ALLOWED_ORIGINS,
       credentials: true,
     },
+    transports: ["websocket", "polling"],
   });
 
   io.on("connection", (socket) => {

@@ -16,10 +16,13 @@ export const create = async (req: Request, res: Response) => {
       });
     }
 
-    // Get auth token
-    const token = req.headers.authorization || `Bearer ${req.cookies.token}`;
-    if (!token) {
-      return res.status(401).json({ message: "Authorization token missing" });
+    // Get auth token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ 
+        message: "Missing or invalid Authorization header",
+        details: "Please provide a valid Bearer token in the Authorization header"
+      });
     }
 
     // Create submission
@@ -31,7 +34,7 @@ export const create = async (req: Request, res: Response) => {
       language,
       code,
       contestId,
-      token
+      authHeader
     );
 
     res.status(201).json({

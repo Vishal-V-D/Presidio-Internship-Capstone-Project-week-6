@@ -1,7 +1,6 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger";
@@ -15,7 +14,15 @@ dotenv.config();
 const app = express();
 
 // 🔐 Security, CORS, and parsers
-const allowedOrigins = ["http://localhost:5173","http://localhost:4000"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:4000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com:5000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com:4000",
+  "http://quantum-judge-alb-dev-233767472.us-east-1.elb.amazonaws.com:8000",
+  "http://quantum-judge-frontend-dev.s3-website-us-east-1.amazonaws.com",
+  "https://dk1cx0l60ut7o.cloudfront.net"
+];
 
 app.use(
   cors({
@@ -26,13 +33,15 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
     credentials: true,
   })
 );
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // 🧠 Request Logger (logs all API hits)
 app.use(requestLogger);

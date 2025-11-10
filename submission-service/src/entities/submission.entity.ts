@@ -73,7 +73,7 @@ export class Submission {
   @Column("json", { nullable: true })
   testResults?: any;
 
-  // AI feedback
+
   @Column("text", { nullable: true })
   feedback?: string;
 

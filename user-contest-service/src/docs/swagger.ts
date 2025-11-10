@@ -17,11 +17,6 @@ const swaggerDefinition = {
 
   components: {
     securitySchemes: {
-      cookieAuth: {
-        type: "apiKey",
-        in: "cookie",
-        name: "token",
-      },
       bearerAuth: {
         type: "http",
         scheme: "bearer",
@@ -76,7 +71,7 @@ const swaggerDefinition = {
     },
   },
 
-  security: [{ cookieAuth: [] }],
+  security: [{ bearerAuth: [] }],
 
   paths: {
     // ---------------------------------------------------
@@ -154,7 +149,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Auth"],
         summary: "Logout user",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         responses: { 200: { description: "User logged out" } },
       },
     },
@@ -163,7 +158,7 @@ const swaggerDefinition = {
       get: {
         tags: ["Auth"],
         summary: "Get current authenticated user",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         responses: { 200: { description: "Authenticated user data" } },
       },
     },
@@ -175,7 +170,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Contests"],
         summary: "Create a new contest",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
           content: {
@@ -208,7 +203,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Contests"],
         summary: "Add problem to contest",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         parameters: [{ name: "id", in: "path", required: true }],
         requestBody: {
           required: true,
@@ -231,7 +226,7 @@ const swaggerDefinition = {
       delete: {
         tags: ["Contests"],
         summary: "Remove problem from contest",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         parameters: [{ name: "cpId", in: "path", required: true }],
         responses: { 204: { description: "Problem removed" } },
       },
@@ -241,7 +236,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Contests"],
         summary: "Register for a contest",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         parameters: [{ name: "id", in: "path", required: true }],
         responses: { 201: { description: "User registered for contest" } },
       },
@@ -251,7 +246,7 @@ const swaggerDefinition = {
       get: {
         tags: ["Contests"],
         summary: "Get contests created by current organizer",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         responses: { 200: { description: "Organizer contests list" } },
       },
     },
@@ -260,7 +255,7 @@ const swaggerDefinition = {
       get: {
         tags: ["Contests"],
         summary: "Get contests current contestant registered for",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         responses: { 200: { description: "Registered contests list" } },
       },
     },
@@ -272,7 +267,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Problems"],
         summary: "Create a problem (public/private)",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
           content: {
@@ -371,7 +366,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Problems"],
         summary: "Add a testcase to a problem",
-        security: [{ cookieAuth: [] }],
+        security: [{ bearerAuth: [] }],
         parameters: [{ name: "id", in: "path", required: true }],
         requestBody: {
           required: true,
