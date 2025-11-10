@@ -30,13 +30,13 @@ All services are container-ready, expose health probes, and communicate over RES
 ## Architecture Overview
 ```mermaid
 graph LR
-    FE[Frontend Client (React/Vite)] -->|REST & WebSocket| SUB[Submission Service<br/>Port 5000]
-    FE -->|REST| UCON[User-Contest Service<br/>Port 4000]
-    SUB -->|Problem metadata| UCON
-    SUB -->|POST /api/ai/feedback| RAG[RAG Pipeline<br/>Port 8000]
-    UCON -->|TypeORM| MYSQL[(MySQL<br/>Users/Contests/Problems)]
-    SUB -->|TypeORM| MYSQL_SUB[(MySQL<br/>Submissions)]
-    RAG -->|Chroma| VECTOR[(Persisted Vector Store)]
+    FE[Frontend Client (React/Vite)] -- "REST & WebSocket" --> SUB[Submission Service<br/>Port 5000]
+    FE -- "REST" --> UCON[User-Contest Service<br/>Port 4000]
+    SUB -- "Problem metadata" --> UCON
+    SUB -- "POST /api/ai/feedback" --> RAG[RAG Pipeline<br/>Port 8000]
+    UCON -- "TypeORM" --> MYSQL[(MySQL<br/>Users/Contests/Problems)]
+    SUB -- "TypeORM" --> MYSQL_SUB[(MySQL<br/>Submissions)]
+    RAG -- "Chroma" --> VECTOR[(Persisted Vector Store)]
 ```
 
 ---
