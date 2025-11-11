@@ -32,7 +32,7 @@ All services are container-ready, expose health probes, and communicate over RES
 
 ```mermaid
 graph LR
-    FE[Frontend Client (React/Vite)] -- REST & WebSocket --> SUB[Submission Service<br/>Port 5000]
+    FE[Frontend Client (React/Vite)] -- REST and WebSocket --> SUB[Submission Service<br/>Port 5000]
     FE -- REST --> UCON[User-Contest Service<br/>Port 4000]
     SUB -- Problem metadata --> UCON
     SUB -- POST /api/ai/feedback --> RAG[RAG Pipeline<br/>Port 8000]
